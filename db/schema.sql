@@ -193,22 +193,87 @@ VALUES ('Amanda', 'Machado', 30, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ('Michelle', 'Trout', 30, null);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- INSERT INTO 
 SELECT * FROM department;
 SELECT * FROM role;
 SELECT * FROM employee;
+
+
+
+-- =, !=, < <=, >, >=	Standard numerical operators	col_name != 4
+-- BETWEEN … AND …	Number is within range of two values (inclusive)	col_name BETWEEN 1.5 AND 10.5
+-- NOT BETWEEN … AND …	Number is not within range of two values (inclusive)	col_name NOT BETWEEN 1 AND 10
+-- IN (…)	Number exists in a list	col_name IN (2, 4, 6)
+-- NOT IN (…)	Number does not exist in a list	col_name NOT IN (1, 3, 5)
+
+-- =	Case sensitive exact string comparison (notice the single equals)	col_name = "abc"
+-- != or <>	Case sensitive exact string inequality comparison	col_name != "abcd"
+-- LIKE	Case insensitive exact string comparison	col_name LIKE "ABC"
+-- NOT LIKE	Case insensitive exact string inequality comparison	col_name NOT LIKE "ABCD"
+-- %	Used anywhere in a string to match a sequence of zero or more characters (only with LIKE or NOT LIKE)	col_name LIKE "%AT%"
+-- (matches "AT", "ATTIC", "CAT" or even "BATS")
+-- _	Used anywhere in a string to match a single character (only with LIKE or NOT LIKE)	col_name LIKE "AN_"
+-- (matches "AND", but not "AN")
+-- IN (…)	String exists in a list	col_name IN ("A", "B", "C")
+-- NOT IN (…)	String does not exist in a list	col_name NOT IN ("D", "E", "F")
+
+-- SELECT title, director FROM movies 
+-- WHERE title LIKE "Toy Story%"; 
+
+-- SELECT column, another_column, …
+-- FROM mytable
+-- WHERE condition(s)
+-- ORDER BY column ASC/DESC
+-- LIMIT num_limit OFFSET num_offset;
+
+-- SELECT DISTINCT director FROM movies
+-- ORDER BY director
+
+-- SELECT title, year FROM movies
+-- ORDER BY year DESC
+-- LIMIT 
+
+-- SELECT title FROM movies
+-- ORDER BY title ASC
+-- LIMIT 5
+
+-- SELECT title FROM movies
+-- ORDER BY title ASC
+-- LIMIT 5 OFFSET 5;
+
+-- SELECT city, population FROM north_american_cities
+-- WHERE country = "Canada";
+
+-- SELECT city, latitude FROM north_american_cities
+-- WHERE country = "United States"
+-- ORDER BY latitude DESC;
+
+-- SELECT city, longitude FROM north_american_cities
+-- WHERE longitude < -87.629798
+-- ORDER BY longitude ASC;
+
+-- SELECT city, population FROM north_american_cities
+-- WHERE country LIKE "Mexico"
+-- ORDER BY population DESC
+-- LIMIT 2;
+
+-- SELECT city, population FROM north_american_cities 
+-- WHERE country = "United States" 
+-- ORDER BY population DESC 
+-- LIMIT 2 OFFSET 2;
+
+-- For Joining Tables:
+
+-- SELECT column, another_table_column, …
+-- FROM mytable
+-- INNER JOIN another_table 
+--     ON mytable.id = another_table.id
+-- WHERE condition(s)
+-- ORDER BY column, … ASC/DESC
+-- LIMIT num_limit OFFSET num_offset;
+
+-- SELECT * FROM Movies INNER JOIN Boxoffice ON
+
+-- SELECT * FROM movies INNER JOIN boxoffice ON id = movie_id WHERE domestic_sales < international_sales;
+
+-- "SELECT users.name AS user, products.name AS favorite FROM users JOIN products ON users.favorite_product = products.id"

@@ -1,12 +1,14 @@
 const connection = require('../employee_tracker/config/connection');
 const inquirer = require('inquirer');
+const table = require('inquirer-table-prompt');
+const { response } = require('express');
 require('console.table'); //for calling tables in console
 
 connection.connect((err) => {
     if (err) throw err;
     mainQuestion();
 });
-
+//prompts user for initial task
 const mainQuestion = () => {
     inquirer
         .prompt (
@@ -15,11 +17,11 @@ const mainQuestion = () => {
             message: 'What do you want to do?',
             name: 'entry',
             choices: [
-                'Update employee role?', //add more choices
+                'Update employee role?',
                 'View employees?',
                 'View roles?',
                 'View departments?',
-                'Add employee, role or department',
+                'Add employee, role, or department?',
                 'Quit?'
             ],
         },
@@ -43,7 +45,7 @@ const mainQuestion = () => {
                 break;
 
             case 'Add employee, role, or department?':
-                addTo();
+                addToTeam();
                 break;
 
             default:
@@ -53,26 +55,30 @@ const mainQuestion = () => {
 };
 // mainQuestion();
 const viewEmps = () => {
-    connection.query('SELECT * FROM employee', (err, data) => {
-           console.table(data);
-        });
+    connection.query('SELECT * FROM employee JOIN role ON employee.role_id = role.id', (err, data) => {
+        console.table(data);
+        mainQuestion();
+    });
 };
 
 const viewRoles = () => {
-    connection.query('SELECT * FROM role', (err, data) => {
-            console.table(data);
+    connection.query('SELECT * FROM role JOIN department ON role.department_id = department.id', (err, data) => {
+        console.table(data);
+        mainQuestion();
     });
 };
 
 const viewDeps = () => {
     connection.query('SELECT * FROM department', (err, data) => {
-            console.table(data);
-    });
+        console.table(data);
+        mainQuestion();
+    });  
 };
 
-const addTo = () => {
+//adding employee, role or department
+const addToTeam = () => {
     inquirer
-    .prompt(
+        .prompt(
         {
             name:'add',
             type:'list',
@@ -84,7 +90,8 @@ const addTo = () => {
                 'quit'
             ],
         },
-    ).then((answer) => {
+    )
+    .then(answer => {
         switch(answer.add) {
     
             case 'employee':
@@ -104,7 +111,7 @@ const addTo = () => {
         };  
     });
 };
-    const addEmployee = () => {
+ function addEmployee() {
         connection.query('SELECT * FROM role', (err, data) => {
             var roleChoices = data.map(role => {
                 return {name: `${role.title}`, value: role.id};
@@ -147,12 +154,12 @@ const addTo = () => {
                     if (err) throw err;
                     mainQuestion();
                 },
-            );
-        });        
-    });
-},
+            )
+        })        
+    })
+    }
 
-    const addRole = () => {
+    function addRole() {
         connection.query('SELECT * FROM department', (err, data) => {
             var departmentChoices = data.map(department => {
                 return {name: `${department.name}`, value: department.id};
@@ -190,20 +197,54 @@ const addTo = () => {
                 },
             );
         });        
-    });
-},
+      }
+    )
+    }
+
+    function addDepartment() {
+        connection.query('SELECT * FROM department', (err, data) => {
+            var departmentChoices = data.map(department => {
+                return {name: `${department.name}`, value: department.id};
+                });
+        inquirer.prompt(
+            [
+                {
+                    message: 'Name of department?',
+                    name: 'depName',
+                    type: 'input'
+                }
+            ],
+        ).then(answers => {
+            connection.query(
+                'INSERT INTO department SET ?',
+                {
+                    name: answers.depName,
+                },
+                err => {
+                    if (err) throw err;
+                    mainQuestion();
+                },
+            );
+        });        
+    })
+
+
+    }
+
+    
 
 
     
 
-function updateRole() {
-    connection.query('SELECT * FROM employee', (err, data) => {
+updateRole = () => {
+    connection.query('SELECT * FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id', (err, data) => {
         if (err) throw err;
         var employeeChoices = data.map(employee => {
-            return {name:`${employee.first_name} ${employee.last_name}`, value: employee.id};
-            });
+            return {name: `${employee.first_name} ${employee.last_name}, role:  ${employee.title}, salary:  ${employee.salary}, Department:  ${employee.name}`, value: employee.id}; 
+        });
         
-    connection.query('SELECT * FROM role', (err, data) => {
+    connection.query('SELECT * FROM role JOIN department ON role.department_id = department.id', (err, data) => {
+        if (err) throw err;
         var roleChoices = data.map(role => {
             return {name: `${role.title}`, value: role.id};
         });
@@ -211,16 +252,17 @@ function updateRole() {
             {
                 message: 'which employee to update?',
                 name: 'updateEmployee',
-                type: 'list',
+                type: 'rawlist',
                 choices: employeeChoices
             },
             {
                 message: 'which role to update?',
                 name: 'updateRole',
-                type: 'list',
+                type: 'rawlist',
                 choices: roleChoices
-            },
-        ]).then(answers => {
+            }
+        ])
+        .then(answers => {
             connection.query(
                 'UPDATE employee SET role_id = ? WHERE id = ?',
                 [
@@ -232,11 +274,7 @@ function updateRole() {
                     mainQuestion();
                 }
             )
-        })
-
-
-
-
+        });
         });
     });
 
